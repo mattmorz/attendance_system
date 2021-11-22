@@ -3,18 +3,29 @@ from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import redirect
 from django.http import HttpResponse
 from django.template import loader
+from django.views.decorators.cache import cache_control
+from attendance_app.models import Student
 
 # Create your views here.
 def index(request):
     return render(request, 'attendance_app/index.html')
 
+@cache_control(no_cache=True,must_revalidate=True,no_store=True)
 def loggedIn(request):
-    username = request.user.username
-    template = loader.get_template('attendance_app/home.html')
-    context = {
-        'username': username
-    }
-    return HttpResponse(template.render(context,request))
+    if request.user.is_authenticated:
+        user = request.user
+        username = user.username
+        user_id = user.id
+        user_profile = Student.objects.filter(user__id=user_id)
+        print (user_profile)
+        template = loader.get_template('attendance_app/home.html')
+        context = {
+            'username': username,
+            'user_profile': user_profile
+        }
+        return HttpResponse(template.render(context,request))
+    else:
+        return redirect('index')
 
 def logout_view(request):
     logout(request)
@@ -40,6 +51,6 @@ def signup(request):
             return HttpResponse(template.render(context,request))
     else:
         context = {
-                'error': None
+                'error': ''
             }
         return HttpResponse(template.render(context,request))
