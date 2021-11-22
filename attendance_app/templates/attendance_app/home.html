@@ -69,7 +69,15 @@
 <main role="main" class="form-signin text-center">
 
   <p>You are Logged In Successfully {{username}}!</p>
-  <a href="{% url 'index' %}">Log out</button>
+  {% if user_profile%}
+    {% for u in user_profile%}
+      <p>First Name: {{u.first_name}}</p>
+      <p>Last Name: {{u.last_name}}</p>
+    {% endfor %}
+  {% else %}
+    <p>Not a Student.</p>
+  {% endif %}
+  <a href="{% url 'log-out' %}">Log out</button>
 </main><!-- /.container -->
 <script src="{% static 'attendance_app/js/jquery-3.5.1.min.js' %}"></script>
 <script src="{% static 'attendance_app/js/popper.min.js' %}"></script></body>
